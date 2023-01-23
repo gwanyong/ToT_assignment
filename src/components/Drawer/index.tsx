@@ -101,15 +101,18 @@ const Drawer = (props: Props) => {
 const __Back = styled.div<StyledProps>`
   width: 100%;
   flex: 1;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   position: fixed;
   z-index: ${(props) => props.zIndex};
   ${__Inset};
 `;
 const __DrawerModal = styled.div<StyledProps>`
-  width: ${(props) => props.width};
-  max-width: 750px;
+  /* width: ${(props) => props.width}; */
   position: fixed;
+  left: 50%;
+  right: 50%;
+  transform: translateX(-50%);
+  max-width: 640px;
   ${(props) => styledDirectionValue[props?.direction as string]};
   z-index: ${(props) => props.zIndex};
   display: flex;

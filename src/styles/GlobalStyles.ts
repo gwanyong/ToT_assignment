@@ -7,8 +7,7 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
   body{
-    margin: 0 auto;
-    max-width: 640px;
+    margin: 0 auto ;
     background-color: #FFFFFF;
     font-family: "Noto Sans KR", sans-serif;
 

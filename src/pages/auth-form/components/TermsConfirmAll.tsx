@@ -11,7 +11,6 @@ interface IProps {
 
 const TermsConfirmAll = (props: IProps) => {
   const { setCheckedList, checkedList, setIsClickedAll, isClickedAll } = props;
-  console.log(checkedList);
 
   useEffect(() => {
     if (checkedList.length === 4) {
