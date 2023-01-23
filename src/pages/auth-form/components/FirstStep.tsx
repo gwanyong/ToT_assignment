@@ -66,6 +66,12 @@ const FirstStep = (props: Props) => {
     setFocus('name');
   }, []);
 
+  useEffect(() => {
+    if (!disabled) {
+      setIsOpen(true);
+    }
+  }, [disabled]);
+
   const moveToPhonInput = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter') {
       setFocus('phoneNumber');
