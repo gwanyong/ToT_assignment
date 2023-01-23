@@ -6,7 +6,7 @@ import App from './App';
 import GlobalStyle from './styles/GlobalStyles';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('root') as HTMLElement,
 );
 root.render(
   <React.StrictMode>
@@ -14,5 +14,5 @@ root.render(
     <ThemeProvider theme={themes}>
       <App />
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

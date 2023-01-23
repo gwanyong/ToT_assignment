@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-pascal-case */
 import React from 'react';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -13,10 +14,8 @@ import SecondStep from './components/SecondStep';
 
 const AuthForm = () => {
   const params = useParams();
-  //testa
   const location = useLocation();
-
-  console.log(params);
+  let disabled = true;
 
   const methods = useForm({ mode: 'all' });
 
@@ -27,7 +26,7 @@ const AuthForm = () => {
       case params.step === '2':
         return <SecondStep />;
       default:
-        return <FirstStep />;
+        return <FirstStep disabled={disabled} />;
     }
   };
 
@@ -56,8 +55,7 @@ const AuthForm = () => {
       });
       return;
     }
-
-    console.log(data);
+    disabled = false;
   };
   return (
     <FormProvider {...methods}>

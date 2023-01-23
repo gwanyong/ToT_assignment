@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
+import Drawer from '../../../components/Drawer';
 import themes from '../../../styles/themes';
 import {
   validateFullRegNo,
   validateName,
   validatePhoneNumber,
 } from '../../../utils/validationUtil';
+import TermsModal from './TermsModal';
 
 interface TForm {
   name: string;
@@ -17,10 +19,16 @@ interface TForm {
   regNum: string;
 }
 
-const FirstStep = () => {
+interface Props {
+  disabled: boolean;
+}
+const FirstStep = (props: Props) => {
+  const { disabled } = props;
+
   const [nameError, setNameError] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [regError, setRegError] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   const { register, setFocus, watch } = useFormContext<TForm>();
@@ -49,8 +57,8 @@ const FirstStep = () => {
       setRegError('');
     }
 
-    if (nameError === '' && phoneNumberError === '' && regError === '') {
-      navigate('/auth?step=2');
+    if (!disabled) {
+      setIsOpen(true);
     }
   };
 
@@ -61,15 +69,16 @@ const FirstStep = () => {
   const moveToPhonInput = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter') {
       setFocus('phoneNumber');
+
       if (!watch('name')) {
         setNameError('올바른 이름을 입력해주세요');
       }
     }
   };
 
-  const moveToRefNumber = (e: React.KeyboardEvent<HTMLElement>) => {
+  const moveToRefNumber = (e) => {
     if (e.key === 'Enter') {
-      setFocus('birth');
+      document.getElementById('birth')?.focus();
     }
   };
 
@@ -78,15 +87,16 @@ const FirstStep = () => {
       setFocus('regNum');
     }
   };
-
-  const haneleOnBirthChange = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.currentTarget.value.length === 6) {
+  const haneleOnBirthChange = (e) => {
+    if (e.target.value.length === 6) {
       setFocus('regNum');
     }
   };
-  //   console.log(watch('name'));
-  //   console.log(watch('phoneNumber'));
-  console.log(watch('regNum'));
+
+  const handleToggleDrawer = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <__Container>
       <h1>
@@ -135,14 +145,23 @@ const FirstStep = () => {
         <__RegNumWrapper>
           <h4>주민등록번호</h4>
           <__RegBox>
-            <__BirthInput
-              {...register('birth')}
-              onKeyPress={(e) => moveToBehindNumber(e)}
-              onChange={(e) => haneleOnBirthChange(e)}
-              maxLength={6}
+            <Controller
+              name="birth"
+              render={({ field: { onChange, name } }) => (
+                <__BirthInput
+                  onChange={(e: any) => {
+                    haneleOnBirthChange(e);
+                    onChange(e);
+                  }}
+                  id={name}
+                  onKeyPress={(e) => moveToBehindNumber(e)}
+                  maxLength={6}
+                />
+              )}
             />
+
             <span>-</span>
-            <__RegInput {...register('regNum')} maxLength={7} />
+            <__RegInput {...register('regNum')} maxLength={7} type="password" />
           </__RegBox>
           {regError && <__ErrorMessage>{regError}</__ErrorMessage>}
         </__RegNumWrapper>
@@ -158,6 +177,14 @@ const FirstStep = () => {
       >
         다음
       </__NextButton>
+
+      <Drawer
+        visible={isOpen}
+        onToggle={handleToggleDrawer}
+        direction={'bottom'}
+      >
+        <TermsModal />
+      </Drawer>
     </__Container>
   );
 };
