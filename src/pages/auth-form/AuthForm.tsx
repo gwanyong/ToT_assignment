@@ -15,7 +15,7 @@ import SecondStep from './components/SecondStep';
 const AuthForm = () => {
   const params = useParams();
   const location = useLocation();
-  let disabled = true;
+  const [disabled, setDisabled] = useState(true);
 
   const methods = useForm({ mode: 'all' });
 
@@ -55,7 +55,7 @@ const AuthForm = () => {
       });
       return;
     }
-    disabled = false;
+    setDisabled(false);
   };
   return (
     <FormProvider {...methods}>
