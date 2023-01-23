@@ -31,6 +31,7 @@ const AuthForm = () => {
   };
 
   const onSubmit = (data: any) => {
+    console.log(data);
     if (
       !validateName(data.name) ||
       data.name[0].includes(' ') ||
@@ -69,5 +70,7 @@ const AuthForm = () => {
 export default AuthForm;
 
 const __Container = styled.form`
+  margin: 0 auto;
+  max-width: 640px;
   min-height: 100vh;
 `;

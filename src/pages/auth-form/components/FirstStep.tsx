@@ -172,6 +172,7 @@ const FirstStep = (props: Props) => {
           {regError && <__ErrorMessage>{regError}</__ErrorMessage>}
         </__RegNumWrapper>
       </__FormWrapper>
+
       <__NextButton
         onClick={handleOnClick}
         disabled={
@@ -183,7 +184,6 @@ const FirstStep = (props: Props) => {
       >
         다음
       </__NextButton>
-
       <Drawer
         visible={isOpen}
         onToggle={handleToggleDrawer}
@@ -201,6 +201,7 @@ const __Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 64px 24px 24px 24px;
+  width: 100%;
   min-height: 100vh;
 
   h1 {

@@ -1,7 +1,11 @@
+import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { RecoilState, useRecoilState } from 'recoil';
 
 import styled from 'styled-components';
+import { serverTimeState } from '../../../recoil/auth/serverTimeState';
 import themes from '../../../styles/themes';
 import TermsConfirmAll from './TermsConfirmAll';
 
@@ -17,6 +21,9 @@ const RegisterTermsMainTemplate = () => {
   const [isClickedAll, setIsClickedAll] = useState(false);
   const [isValidate, setIsValidate] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+  const [serverTime, setServerTime] = useRecoilState(serverTimeState);
+
+  const navigate = useNavigate();
 
   const handleCheckedBtn = (id) => {
     setIsClicked(!isClicked);
@@ -28,6 +35,18 @@ const RegisterTermsMainTemplate = () => {
     } else {
       setCheckedList([...checkedList, id]);
     }
+  };
+
+  const handleOnClick = async () => {
+    navigate('/auth/2');
+    const res = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
+    );
+
+    setServerTime({
+      startedAt: res?.data?.data?.startedAt,
+      expiredAt: res?.data?.data?.expiredAt,
+    });
   };
 
   return (
@@ -57,7 +76,10 @@ const RegisterTermsMainTemplate = () => {
           })}
         </__ListWrapper>
         <__BtnWrapper>
-          <__ConfirmBtn disabled={checkedList.length !== 4}>
+          <__ConfirmBtn
+            disabled={checkedList.length !== 4}
+            onClick={handleOnClick}
+          >
             동의하고 간편인증 하기
           </__ConfirmBtn>
         </__BtnWrapper>
@@ -70,7 +92,7 @@ export default RegisterTermsMainTemplate;
 
 const __RegisterWrapper = styled.div`
   padding: 20px;
-  max-width: 640px;
+  width: 100%;
   border-radius: 10px 10px 0 0;
   background: #ffffff;
 `;
