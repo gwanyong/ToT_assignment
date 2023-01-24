@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-pascal-case */
+import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -30,8 +31,7 @@ const AuthForm = () => {
     }
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
     if (
       !validateName(data.name) ||
       data.name[0].includes(' ') ||
@@ -57,6 +57,16 @@ const AuthForm = () => {
       return;
     }
     setDisabled(false);
+    console.log(data);
+    // try {
+    //   const body = data;
+    //   const res = axios.post(
+    //     `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
+    //     body,
+    //   );
+    // } catch (error) {
+    //   alert('올바른 정보를 입력해주세요.');
+    // }
   };
   return (
     <FormProvider {...methods}>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
 import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +22,6 @@ const RegisterTermsMainTemplate = () => {
   const [isClickedAll, setIsClickedAll] = useState(false);
   const [isValidate, setIsValidate] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
-  const [serverTime, setServerTime] = useRecoilState(serverTimeState);
 
   const navigate = useNavigate();
 
@@ -42,11 +42,10 @@ const RegisterTermsMainTemplate = () => {
     const res = await axios.post(
       `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
     );
-
-    setServerTime({
-      startedAt: res?.data?.data?.startedAt,
-      expiredAt: res?.data?.data?.expiredAt,
-    });
+    if (res.status === 200) {
+      sessionStorage.setItem('startedAt', res?.data?.data?.startedAt);
+      sessionStorage.setItem('expiredAt', res?.data?.data?.expiredAt);
+    }
   };
 
   return (
