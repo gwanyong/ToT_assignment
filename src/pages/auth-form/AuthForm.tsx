@@ -1,9 +1,12 @@
 /* eslint-disable react/jsx-pascal-case */
+import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { errorMessageState } from '../../recoil/auth/errorMessageState';
 import {
   validateFullRegNo,
   validateName,
@@ -11,11 +14,14 @@ import {
 } from '../../utils/validationUtil';
 import FirstStep from './components/FirstStep';
 import SecondStep from './components/SecondStep';
+import ThirdStep from './components/ThirdStep';
 
 const AuthForm = () => {
   const params = useParams();
   const location = useLocation();
+  const navigator = useNavigate();
   const [disabled, setDisabled] = useState(true);
+  const setErrMessage = useSetRecoilState(errorMessageState);
 
   const methods = useForm({ mode: 'all' });
 
@@ -25,13 +31,14 @@ const AuthForm = () => {
     switch (true) {
       case params.step === '2':
         return <SecondStep />;
+      case params.step === '3':
+        return <ThirdStep />;
       default:
         return <FirstStep disabled={disabled} />;
     }
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: any) => {
     if (
       !validateName(data.name) ||
       data.name[0].includes(' ') ||
@@ -57,6 +64,20 @@ const AuthForm = () => {
       return;
     }
     setDisabled(false);
+    console.log(data);
+    try {
+      const body = {
+        name: data?.name,
+        phoneNumber: data?.phoneNumber,
+        regNumber: data?.birth + data?.regNum,
+      };
+      const res = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
+        { ...body },
+      );
+    } catch (error) {
+      setErrMessage('올바른 정보를 입력해주세요.');
+    }
   };
   return (
     <FormProvider {...methods}>

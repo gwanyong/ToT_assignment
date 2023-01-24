@@ -1,15 +1,34 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
+import dayjs from 'dayjs';
+import React, { useEffect, useRef, useState } from 'react';
+import Countdown from 'react-countdown';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { IGuide } from '../../../../interfaces/guide';
 import { serverTimeState } from '../../../recoil/auth/serverTimeState';
 import themes from '../../../styles/themes';
 import GuideList from './GuideList';
+import utc from 'dayjs/plugin/utc';
+import { errorMessageState } from '../../../recoil/auth/errorMessageState';
+import { useNavigate } from 'react-router-dom';
+
+dayjs.extend(utc);
 
 const SecondStep = () => {
+  const startedAt = sessionStorage?.getItem('startedAt');
+  const expiredAt = sessionStorage?.getItem('expiredAt');
+  const started = dayjs(startedAt).utc();
+  const ended = dayjs(expiredAt).utc();
+
+  const diff = ended.diff(started);
+
   const [guideList, setGuideList] = useState<IGuide[]>([]);
-  const serverTime = useRecoilState(serverTimeState);
+  const [isExpired, setIsExpired] = useState(false);
+  const [currentTime, setCurrentTime] = useState<number>(Date.now() + diff);
+  const errorMessage = useRecoilValue(errorMessageState);
+
+  const navigator = useNavigate();
+  const countdownRef = useRef<Countdown>(null);
 
   //가이드 리스트 호출 함수
   const fetchGuideList = async () => {
@@ -29,6 +48,47 @@ const SecondStep = () => {
     fetchGuideList();
   }, []);
 
+  useEffect(() => {
+    if (isExpired) {
+      countdownRef?.current?.start();
+    }
+  }, [isExpired]);
+
+  // 분, 초를 받아 10초 남기고 styled 반영
+  const renderer = ({ minutes, seconds }) => {
+    return (
+      <>
+        <__TimerImg seconds={seconds} minutes={minutes}></__TimerImg>
+        <__CountDown seconds={seconds} minutes={minutes}>
+          0{minutes} : {String(seconds).length === 1 ? `0${seconds}` : seconds}
+        </__CountDown>
+      </>
+    );
+  };
+
+  //인증 완료 버튼 클릭 시
+  const handleOnClick = async () => {
+    if (isExpired) {
+      if (
+        window.confirm(
+          '인증 요청시간이 지났습니다.\n간편인증을 다시 시도해 주세요.',
+        )
+      ) {
+        setIsExpired(false);
+        countdownRef?.current?.start();
+        setCurrentTime(Date.now() + diff);
+      }
+    }
+
+    if (errorMessage) {
+      if (window.confirm(errorMessage)) {
+        window.open('/', '_self', 'noopener, noreferrer');
+      }
+    } else {
+      navigator('/auth/3', { replace: true });
+    }
+  };
+
   return (
     <__Container>
       <__HeaderWrapper>
@@ -38,8 +98,14 @@ const SecondStep = () => {
           간편인증 요청을 보냈습니다.
         </h1>
         <__TimerWrapper>
-          <img alt={'timer'} src="/images/timer.png" />
-          <span>04:51</span>
+          <Countdown
+            ref={countdownRef}
+            date={currentTime}
+            renderer={renderer}
+            // onComplete={() => {
+            //   setIsExpired(true);
+            // }}
+          />
         </__TimerWrapper>
       </__HeaderWrapper>
       <__Dimmer />
@@ -51,7 +117,7 @@ const SecondStep = () => {
         </__ListWrapper>
       </__GuideWrapper>
       <__ButtonWrapper>
-        <__AuthBtn>인증 완료</__AuthBtn>
+        <__AuthBtn onClick={handleOnClick}>인증 완료</__AuthBtn>
       </__ButtonWrapper>
     </__Container>
   );
@@ -90,18 +156,26 @@ const __HeaderWrapper = styled.section`
 
 const __TimerWrapper = styled.div`
   display: flex;
-  align-items: center;
   padding: 4px 9px;
   background-color: #f2f4f8;
   border-radius: 4px;
+`;
 
-  img {
-    margin-right: 4px;
-  }
+const __TimerImg = styled.div<{ seconds: number; minutes: number }>`
+  width: 16px;
+  height: 16px;
+  ${(props) =>
+    props.seconds <= 10 && props.minutes === 0
+      ? '/images/timer-red.png'
+      : '/images/timer.png'}
+`;
 
-  span {
-    color: #878d96;
-  }
+const __CountDown = styled.p<{ seconds: number; minutes: number }>`
+  margin-left: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: ${(props) =>
+    props.seconds <= 10 && props.minutes === 0 ? themes.color.red : '#878d96'};
 `;
 
 const __Dimmer = styled.div`
@@ -122,8 +196,8 @@ const __ListWrapper = styled.ul`
 `;
 
 const __ButtonWrapper = styled.div`
-  max-width: 592px;
   margin: auto 0 24px 0;
+  padding: 0 24px;
 `;
 
 const __AuthBtn = styled.button`
