@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RecoilState, useRecoilState } from 'recoil';
@@ -38,7 +38,7 @@ const RegisterTermsMainTemplate = () => {
   };
 
   const handleOnClick = async () => {
-    navigate('/auth/2');
+    navigate('/auth/2', { replace: true });
     const res = await axios.post(
       `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
     );

@@ -2,13 +2,15 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { useEffect, useRef, useState } from 'react';
 import Countdown from 'react-countdown';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { IGuide } from '../../../../interfaces/guide';
 import { serverTimeState } from '../../../recoil/auth/serverTimeState';
 import themes from '../../../styles/themes';
 import GuideList from './GuideList';
 import utc from 'dayjs/plugin/utc';
+import { errorMessageState } from '../../../recoil/auth/errorMessageState';
+import { useNavigate } from 'react-router-dom';
 
 dayjs.extend(utc);
 
@@ -23,7 +25,9 @@ const SecondStep = () => {
   const [guideList, setGuideList] = useState<IGuide[]>([]);
   const [isExpired, setIsExpired] = useState(false);
   const [currentTime, setCurrentTime] = useState<number>(Date.now() + diff);
+  const errorMessage = useRecoilValue(errorMessageState);
 
+  const navigator = useNavigate();
   const countdownRef = useRef<Countdown>(null);
 
   //가이드 리스트 호출 함수
@@ -52,9 +56,6 @@ const SecondStep = () => {
 
   // 분, 초를 받아 10초 남기고 styled 반영
   const renderer = ({ minutes, seconds }) => {
-    // if (minutes === 0 && seconds === 0) {
-    //   setIsExpired(true);
-    // }
     return (
       <>
         <__TimerImg seconds={seconds} minutes={minutes}></__TimerImg>
@@ -77,6 +78,14 @@ const SecondStep = () => {
         countdownRef?.current?.start();
         setCurrentTime(Date.now() + diff);
       }
+    }
+
+    if (errorMessage) {
+      if (window.confirm(errorMessage)) {
+        window.open('/', '_self', 'noopener, noreferrer');
+      }
+    } else {
+      navigator('/auth/3', { replace: true });
     }
   };
 
@@ -155,10 +164,10 @@ const __TimerWrapper = styled.div`
 const __TimerImg = styled.div<{ seconds: number; minutes: number }>`
   width: 16px;
   height: 16px;
-  background: url(${(props) =>
+  ${(props) =>
     props.seconds <= 10 && props.minutes === 0
       ? '/images/timer-red.png'
-      : '/images/timer.png'});
+      : '/images/timer.png'}
 `;
 
 const __CountDown = styled.p<{ seconds: number; minutes: number }>`

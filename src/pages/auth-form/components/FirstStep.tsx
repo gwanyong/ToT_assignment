@@ -31,6 +31,8 @@ const FirstStep = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
+  console.log(isOpen);
+
   const { register, setFocus, watch } = useFormContext<TForm>();
 
   const handleOnClick = () => {

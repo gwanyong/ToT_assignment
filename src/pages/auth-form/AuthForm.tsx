@@ -3,8 +3,10 @@ import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { errorMessageState } from '../../recoil/auth/errorMessageState';
 import {
   validateFullRegNo,
   validateName,
@@ -12,11 +14,14 @@ import {
 } from '../../utils/validationUtil';
 import FirstStep from './components/FirstStep';
 import SecondStep from './components/SecondStep';
+import ThirdStep from './components/ThirdStep';
 
 const AuthForm = () => {
   const params = useParams();
   const location = useLocation();
+  const navigator = useNavigate();
   const [disabled, setDisabled] = useState(true);
+  const setErrMessage = useSetRecoilState(errorMessageState);
 
   const methods = useForm({ mode: 'all' });
 
@@ -26,6 +31,8 @@ const AuthForm = () => {
     switch (true) {
       case params.step === '2':
         return <SecondStep />;
+      case params.step === '3':
+        return <ThirdStep />;
       default:
         return <FirstStep disabled={disabled} />;
     }
@@ -58,15 +65,19 @@ const AuthForm = () => {
     }
     setDisabled(false);
     console.log(data);
-    // try {
-    //   const body = data;
-    //   const res = axios.post(
-    //     `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
-    //     body,
-    //   );
-    // } catch (error) {
-    //   alert('올바른 정보를 입력해주세요.');
-    // }
+    try {
+      const body = {
+        name: data?.name,
+        phoneNumber: data?.phoneNumber,
+        regNumber: data?.birth + data?.regNum,
+      };
+      const res = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
+        { ...body },
+      );
+    } catch (error) {
+      setErrMessage('올바른 정보를 입력해주세요.');
+    }
   };
   return (
     <FormProvider {...methods}>
