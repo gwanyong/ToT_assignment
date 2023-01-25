@@ -38,7 +38,7 @@ const RegisterTermsMainTemplate = () => {
   };
 
   const handleOnClick = async () => {
-    navigate('/auth/2', { replace: true });
+    navigate('/auth/2');
     const res = await axios.post(
       `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
     );

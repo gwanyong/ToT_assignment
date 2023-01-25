@@ -3,6 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
+import { IForm } from '../../../../interfaces/form';
 import Drawer from '../../../components/Drawer';
 import themes from '../../../styles/themes';
 import {
@@ -11,13 +12,6 @@ import {
   validatePhoneNumber,
 } from '../../../utils/validationUtil';
 import TermsModal from './TermsModal';
-
-interface TForm {
-  name: string;
-  phoneNumber: string;
-  birth: string;
-  regNum: string;
-}
 
 interface Props {
   disabled: boolean;
@@ -29,11 +23,8 @@ const FirstStep = (props: Props) => {
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [regError, setRegError] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
 
-  console.log(isOpen);
-
-  const { register, setFocus, watch } = useFormContext<TForm>();
+  const { register, setFocus, watch } = useFormContext<IForm>();
 
   const handleOnClick = () => {
     if (

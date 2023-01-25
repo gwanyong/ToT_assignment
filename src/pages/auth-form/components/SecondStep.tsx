@@ -24,7 +24,7 @@ const SecondStep = () => {
 
   const [guideList, setGuideList] = useState<IGuide[]>([]);
   const [isExpired, setIsExpired] = useState(false);
-  const [currentTime, setCurrentTime] = useState<number>(Date.now() + diff);
+  const [currentTime, setCurrentTime] = useState<number>(Date.now() + 4000);
   const errorMessage = useRecoilValue(errorMessageState);
 
   const navigator = useNavigate();
@@ -77,6 +77,7 @@ const SecondStep = () => {
         setIsExpired(false);
         countdownRef?.current?.start();
         setCurrentTime(Date.now() + diff);
+        return;
       }
     }
 
@@ -102,9 +103,9 @@ const SecondStep = () => {
             ref={countdownRef}
             date={currentTime}
             renderer={renderer}
-            // onComplete={() => {
-            //   setIsExpired(true);
-            // }}
+            onComplete={() => {
+              setIsExpired(true);
+            }}
           />
         </__TimerWrapper>
       </__HeaderWrapper>
