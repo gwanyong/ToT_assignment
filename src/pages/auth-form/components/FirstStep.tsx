@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
+import { IForm } from '../../../../interfaces/form';
 import Drawer from '../../../components/Drawer';
 import themes from '../../../styles/themes';
 import {
@@ -12,28 +12,22 @@ import {
 } from '../../../utils/validationUtil';
 import TermsModal from './TermsModal';
 
-interface TForm {
-  name: string;
-  phoneNumber: string;
-  birth: string;
-  regNum: string;
-}
-
 interface Props {
   disabled: boolean;
 }
 const FirstStep = (props: Props) => {
   const { disabled } = props;
+  const {
+    register,
+    setFocus,
+    watch,
+    formState: { errors },
+  } = useFormContext<IForm>();
 
   const [nameError, setNameError] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [regError, setRegError] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-
-  console.log(isOpen);
-
-  const { register, setFocus, watch } = useFormContext<TForm>();
 
   const handleOnClick = () => {
     if (
@@ -46,19 +40,16 @@ const FirstStep = (props: Props) => {
     } else {
       setNameError('');
     }
-
     if (!validatePhoneNumber(watch('phoneNumber'))) {
       setPhoneNumberError('올바른 전화번호를 입력해주세요');
     } else {
       setPhoneNumberError('');
     }
-
     if (!validateFullRegNo(watch('birth') + watch('regNum'))) {
       setRegError('올바른 주민등록번호를 입력해주세요');
     } else {
       setRegError('');
     }
-
     if (!disabled) {
       setIsOpen(true);
     }

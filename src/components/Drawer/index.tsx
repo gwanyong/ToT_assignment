@@ -40,7 +40,7 @@ const styledDirectionValue = {
   bottom: {
     width: '100%',
     bottom: 0,
-    justifyContent: 'flex-end',
+    // justifyContent: 'flex-end',
     flexDirection: 'column',
   },
   top: {
@@ -51,14 +51,7 @@ const styledDirectionValue = {
   },
 };
 const Drawer = (props: Props) => {
-  const {
-    visible,
-    onToggle,
-    direction,
-    children,
-    width = 'auto',
-    zIndex = 100,
-  } = props;
+  const { visible, onToggle, direction, children, zIndex = 100 } = props;
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -89,7 +82,7 @@ const Drawer = (props: Props) => {
           unmountOnExit
           timeout={500}
         >
-          <__DrawerModal direction={direction} width={width} zIndex={zIndex}>
+          <__DrawerModal direction={direction} zIndex={zIndex}>
             {children}
           </__DrawerModal>
         </CSSTransition>
@@ -107,11 +100,10 @@ const __Back = styled.div<StyledProps>`
   ${__Inset};
 `;
 const __DrawerModal = styled.div<StyledProps>`
-  /* width: ${(props) => props.width}; */
   position: fixed;
-  left: 50%;
-  right: 50%;
-  transform: translateX(-50%);
+  margin: 0 auto;
+  left: 0;
+  right: 0;
   max-width: 640px;
   ${(props) => styledDirectionValue[props?.direction as string]};
   z-index: ${(props) => props.zIndex};
@@ -155,6 +147,7 @@ const __DrawerWrapper = styled.div`
 
   .slideBottomIn-enter {
     transform: translateY(2000px);
+
     opacity: 1;
   }
   .slideBottomIn-enter-active {
