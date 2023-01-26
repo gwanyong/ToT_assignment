@@ -20,6 +20,7 @@ const FirstStep = (props: Props) => {
   const {
     register,
     setFocus,
+    getValues,
     watch,
     formState: { errors },
   } = useFormContext<IForm>();
@@ -50,20 +51,19 @@ const FirstStep = (props: Props) => {
     } else {
       setRegError('');
     }
-    if (!disabled) {
-      setIsOpen(true);
-    }
+
+    setIsOpen(true);
   };
 
   useEffect(() => {
     setFocus('name');
   }, []);
-
-  useEffect(() => {
-    if (!disabled) {
-      setIsOpen(true);
-    }
-  }, [disabled]);
+  console.log(isOpen);
+  // useEffect(() => {
+  //   if (!disabled) {
+  //     setIsOpen(true);
+  //   }
+  // }, [disabled]);
 
   const moveToPhonInput = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter') {
@@ -148,6 +148,7 @@ const FirstStep = (props: Props) => {
               name="birth"
               render={({ field: { onChange, name } }) => (
                 <__BirthInput
+                  defaultValue={getValues('birth')}
                   onChange={(e: any) => {
                     haneleOnBirthChange(e);
                     onChange(e);

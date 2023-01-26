@@ -96,7 +96,7 @@ const SecondStep = () => {
     //인증완료 버튼 클릭 시 에러가 발생한다면 다시 인증정보 페이지 오픈!
     if (errorMessage) {
       if (window.confirm(errorMessage)) {
-        window.open('/', '_self', 'noopener, noreferrer');
+        navigator('/', { replace: true });
       }
     } else {
       navigator('/auth/3', { replace: true });
