@@ -22,6 +22,7 @@ const SecondStep = () => {
   const errorMessage = useRecoilValue(errorMessageState);
   const startedAt = sessionStorage?.getItem('startedAt') as string;
   const expiredAt = sessionStorage?.getItem('expiredAt');
+
   const diff = dayjs(expiredAt).utc().diff(dayjs(startedAt).utc());
 
   const [guideList, setGuideList] = useState<IGuide[]>([]);
@@ -92,7 +93,7 @@ const SecondStep = () => {
         return;
       }
     }
-    //이름이 맞지 않아 에러메세지 발생 시 다시 인증정보 페이지 열림
+    //인증완료 버튼 클릭 시 에러가 발생한다면 다시 인증정보 페이지 오픈!
     if (errorMessage) {
       if (window.confirm(errorMessage)) {
         window.open('/', '_self', 'noopener, noreferrer');
