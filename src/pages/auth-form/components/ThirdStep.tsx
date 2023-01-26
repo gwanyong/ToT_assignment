@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import AuthInfo from './AuthInfo';
 import useSWR from 'swr';
-import { useFormContext } from 'react-hook-form';
-import { IForm } from '../../../../interfaces/form';
-import TaxInfo from './TaxInfo';
+import AuthInfo from './AuthInfo';
 import OfficeInfo from './OfficeInfo';
+import TaxInfo from './TaxInfo';
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -28,7 +26,7 @@ const ThirdStep = () => {
       <h1>인증완료</h1>
       <__Noti>본인인증이 완료되었습니다.</__Noti>
       <__Wrapper>
-        <AuthInfo titles={['이름', '휴대폰 번호', '주민등록번호']} />
+        <AuthInfo />
         <TaxInfo {...incomeData?.data?.tax} />
         <OfficeInfo {...officeData?.data?.tax?.office} />
       </__Wrapper>

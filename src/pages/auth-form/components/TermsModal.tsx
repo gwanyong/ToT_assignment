@@ -1,12 +1,10 @@
 import axios from 'axios';
-import dayjs from 'dayjs';
-import React, { Dispatch, SetStateAction } from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { RecoilState, useRecoilState } from 'recoil';
 
 import styled from 'styled-components';
-import { serverTimeState } from '../../../recoil/auth/serverTimeState';
+import { IForm } from '../../../../interfaces/form';
 import themes from '../../../styles/themes';
 import TermsConfirmAll from './TermsConfirmAll';
 
@@ -20,8 +18,10 @@ const titleList = [
 const RegisterTermsMainTemplate = () => {
   const [checkedList, setCheckedList] = useState<number[]>([]);
   const [isClickedAll, setIsClickedAll] = useState(false);
-  const [isValidate, setIsValidate] = useState(false);
+
   const [isClicked, setIsClicked] = useState(false);
+
+  const { getValues } = useFormContext<IForm>();
 
   const navigate = useNavigate();
 
@@ -45,6 +45,7 @@ const RegisterTermsMainTemplate = () => {
     if (res.status === 200) {
       sessionStorage.setItem('startedAt', res?.data?.data?.startedAt);
       sessionStorage.setItem('expiredAt', res?.data?.data?.expiredAt);
+      sessionStorage.setItem('userInfo', JSON.stringify(getValues()));
     }
   };
 

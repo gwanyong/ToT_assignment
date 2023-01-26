@@ -1,10 +1,9 @@
 /* eslint-disable react/jsx-pascal-case */
-import axios from 'axios';
 import React from 'react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { errorMessageState } from '../../recoil/auth/errorMessageState';
 import {
@@ -27,6 +26,7 @@ const AuthForm = () => {
 
   const { setError } = methods;
 
+  //각 스텝별 페이지 렌더링
   const switchAuthPage = () => {
     switch (true) {
       case params.step === '2':
@@ -64,17 +64,12 @@ const AuthForm = () => {
       return;
     }
     setDisabled(false);
-    console.log(data);
     try {
       const body = {
         name: data?.name,
         phoneNumber: data?.phoneNumber,
         regNumber: data?.birth + data?.regNum,
       };
-      const res = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
-        { ...body },
-      );
     } catch (error) {
       setErrMessage('올바른 정보를 입력해주세요.');
     }

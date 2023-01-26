@@ -1,15 +1,11 @@
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
 import styled from 'styled-components';
-import { IForm } from '../../../../interfaces/form';
 
-interface Props {
-  titles: string[];
-}
+const titles = ['이름', '휴대폰 번호', '주민등록번호'];
 
-const AuthInfo = (props: Props) => {
-  const { titles } = props;
-  const { getValues } = useFormContext<IForm>();
+const AuthInfo = () => {
+  const getSessionData = sessionStorage.getItem('userInfo') as string;
+  const userInfo = JSON.parse(getSessionData);
 
   //주민번호 마스킹 함수
   const maskRegNum = (regNum: string) => {
@@ -29,10 +25,10 @@ const AuthInfo = (props: Props) => {
           })}
         </div>
         <div>
-          <__Info>{getValues('name')}</__Info>
-          <__Info>{getValues('phoneNumber')}</__Info>
+          <__Info>{userInfo.name}</__Info>
+          <__Info>{userInfo.phoneNumber}</__Info>
           <__Info>
-            {getValues('birth')}-{maskRegNum(getValues('regNum'))}
+            {userInfo.birth}-{maskRegNum(userInfo.regNum)}
           </__Info>
         </div>
       </__InfoBox>

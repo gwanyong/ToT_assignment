@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { IForm } from '../../../../interfaces/form';

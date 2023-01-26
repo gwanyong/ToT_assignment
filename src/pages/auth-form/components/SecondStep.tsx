@@ -1,34 +1,47 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { useEffect, useRef, useState } from 'react';
+
+import utc from 'dayjs/plugin/utc';
 import Countdown from 'react-countdown';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import styled, { css } from 'styled-components';
+import useSWR from 'swr';
 import { IGuide } from '../../../../interfaces/guide';
-import { serverTimeState } from '../../../recoil/auth/serverTimeState';
+import { errorMessageState } from '../../../recoil/auth/errorMessageState';
 import themes from '../../../styles/themes';
 import GuideList from './GuideList';
-import utc from 'dayjs/plugin/utc';
-import { errorMessageState } from '../../../recoil/auth/errorMessageState';
-import { useNavigate } from 'react-router-dom';
 
 dayjs.extend(utc);
 
+const fetcher = (url) => fetch(url).then((res) => res.json());
 const SecondStep = () => {
-  const startedAt = sessionStorage?.getItem('startedAt');
+  const navigator = useNavigate();
+  const countdownRef = useRef<Countdown>(null);
+  const errorMessage = useRecoilValue(errorMessageState);
+  const startedAt = sessionStorage?.getItem('startedAt') as string;
   const expiredAt = sessionStorage?.getItem('expiredAt');
-  const started = dayjs(startedAt).utc();
-  const ended = dayjs(expiredAt).utc();
-
-  const diff = ended.diff(started);
+  const diff = dayjs(expiredAt).utc().diff(dayjs(startedAt).utc());
 
   const [guideList, setGuideList] = useState<IGuide[]>([]);
   const [isExpired, setIsExpired] = useState(false);
-  const [currentTime, setCurrentTime] = useState<number>(Date.now() + 4000);
-  const errorMessage = useRecoilValue(errorMessageState);
+  const [isReset, setIsReset] = useState(false);
 
-  const navigator = useNavigate();
-  const countdownRef = useRef<Countdown>(null);
+  const { data: server } = useSWR(
+    `${process.env.REACT_APP_BASE_URL}/api/v1/serverTime`,
+    fetcher,
+  );
+
+  const serverTime = server?.data?.serverTime;
+
+  const resetTime = isReset ? serverTime : startedAt;
+
+  const utc =
+    new Date(resetTime).getTime() +
+    new Date(resetTime).getTimezoneOffset() * 60 * 1000;
+
+  const now = new Date(utc).getTime();
 
   //가이드 리스트 호출 함수
   const fetchGuideList = async () => {
@@ -45,14 +58,12 @@ const SecondStep = () => {
   };
 
   useEffect(() => {
-    fetchGuideList();
-  }, []);
+    countdownRef?.current?.start();
+  }, [startedAt, serverTime, isReset]);
 
   useEffect(() => {
-    if (isExpired) {
-      countdownRef?.current?.start();
-    }
-  }, [isExpired]);
+    fetchGuideList();
+  }, []);
 
   // 분, 초를 받아 10초 남기고 styled 반영
   const renderer = ({ minutes, seconds }) => {
@@ -74,13 +85,14 @@ const SecondStep = () => {
           '인증 요청시간이 지났습니다.\n간편인증을 다시 시도해 주세요.',
         )
       ) {
+        setIsReset(true);
         setIsExpired(false);
         countdownRef?.current?.start();
-        setCurrentTime(Date.now() + diff);
+
         return;
       }
     }
-
+    //이름이 맞지 않아 에러메세지 발생 시 다시 인증정보 페이지 열림
     if (errorMessage) {
       if (window.confirm(errorMessage)) {
         window.open('/', '_self', 'noopener, noreferrer');
@@ -89,7 +101,6 @@ const SecondStep = () => {
       navigator('/auth/3', { replace: true });
     }
   };
-
   return (
     <__Container>
       <__HeaderWrapper>
@@ -101,7 +112,7 @@ const SecondStep = () => {
         <__TimerWrapper>
           <Countdown
             ref={countdownRef}
-            date={currentTime}
+            date={now + diff}
             renderer={renderer}
             onComplete={() => {
               setIsExpired(true);
@@ -167,8 +178,12 @@ const __TimerImg = styled.div<{ seconds: number; minutes: number }>`
   height: 16px;
   ${(props) =>
     props.seconds <= 10 && props.minutes === 0
-      ? '/images/timer-red.png'
-      : '/images/timer.png'}
+      ? css`
+          background: url('/images/timer-red.png');
+        `
+      : css`
+          background: url('/images/timer.png');
+        `}
 `;
 
 const __CountDown = styled.p<{ seconds: number; minutes: number }>`
