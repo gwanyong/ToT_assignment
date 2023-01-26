@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useSetRecoilState } from 'recoil';
 
 import styled from 'styled-components';
 import { IForm } from '../../../../interfaces/form';
 import Drawer from '../../../components/Drawer';
+import { disabledState } from '../../../recoil/auth/disabledState';
 import themes from '../../../styles/themes';
 import {
   validateFullRegNo,
@@ -17,18 +19,13 @@ interface Props {
 }
 const FirstStep = (props: Props) => {
   const { disabled } = props;
-  const {
-    register,
-    setFocus,
-    getValues,
-    watch,
-    formState: { errors },
-  } = useFormContext<IForm>();
+  const { register, setFocus, getValues, watch } = useFormContext<IForm>();
 
   const [nameError, setNameError] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [regError, setRegError] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const setDisabledState = useSetRecoilState(disabledState);
 
   const handleOnClick = () => {
     if (
@@ -52,18 +49,21 @@ const FirstStep = (props: Props) => {
       setRegError('');
     }
 
-    setIsOpen(true);
+    setIsOpen(false);
   };
 
   useEffect(() => {
     setFocus('name');
   }, []);
-  console.log(isOpen);
-  // useEffect(() => {
-  //   if (!disabled) {
-  //     setIsOpen(true);
-  //   }
-  // }, [disabled]);
+
+  useEffect(() => {
+    if (!disabled) {
+      setIsOpen(true);
+    }
+    return () => {
+      setDisabledState(true);
+    };
+  }, [disabled]);
 
   const moveToPhonInput = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === 'Enter') {
@@ -183,7 +183,7 @@ const FirstStep = (props: Props) => {
         onToggle={handleToggleDrawer}
         direction={'bottom'}
       >
-        <TermsModal />
+        <TermsModal onToggle={handleToggleDrawer} />
       </Drawer>
     </__Container>
   );

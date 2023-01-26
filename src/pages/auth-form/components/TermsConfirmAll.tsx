@@ -20,6 +20,7 @@ const TermsConfirmAll = (props: IProps) => {
     }
   }, [checkedList?.length]);
 
+  // 모두동의 버튼 클릭 함수
   const handleClickAll = () => {
     setIsClickedAll(!isClickedAll);
     if (isClickedAll) {

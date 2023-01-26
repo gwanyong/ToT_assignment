@@ -15,7 +15,12 @@ const titleList = [
   { id: 4, data: '[필수] 제3자 정보제공 동의' },
 ];
 
-const RegisterTermsMainTemplate = () => {
+interface Props {
+  onToggle: () => void;
+}
+
+const RegisterTermsMainTemplate = (props: Props) => {
+  const { onToggle } = props;
   const [checkedList, setCheckedList] = useState<number[]>([]);
   const [isClickedAll, setIsClickedAll] = useState(false);
 
@@ -25,6 +30,7 @@ const RegisterTermsMainTemplate = () => {
 
   const navigate = useNavigate();
 
+  //각각의 체크박스 클릭 함수
   const handleCheckedBtn = (id) => {
     setIsClicked(!isClicked);
     if (checkedList.includes(id)) {
@@ -37,15 +43,21 @@ const RegisterTermsMainTemplate = () => {
     }
   };
 
+  //모두 체크된 이후 인증버튼 클릭 함수
   const handleOnClick = async () => {
     navigate('/auth/2');
-    const res = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
-    );
-    if (res.status === 200) {
-      sessionStorage.setItem('startedAt', res?.data?.data?.startedAt);
-      sessionStorage.setItem('expiredAt', res?.data?.data?.expiredAt);
-      sessionStorage.setItem('userInfo', JSON.stringify(getValues()));
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/request`,
+      );
+      if (res.status === 200) {
+        onToggle();
+        sessionStorage.setItem('startedAt', res?.data?.data?.startedAt);
+        sessionStorage.setItem('expiredAt', res?.data?.data?.expiredAt);
+        sessionStorage.setItem('userInfo', JSON.stringify(getValues()));
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

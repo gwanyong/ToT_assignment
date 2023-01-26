@@ -4,8 +4,9 @@ import React from 'react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { disabledState } from '../../recoil/auth/disabledState';
 import { errorMessageState } from '../../recoil/auth/errorMessageState';
 import {
   validateFullRegNo,
@@ -18,11 +19,11 @@ import ThirdStep from './components/ThirdStep';
 
 const AuthForm = () => {
   const params = useParams();
-  const [disabled, setDisabled] = useState(true);
 
   const methods = useForm({ mode: 'all' });
 
   const setErrMessage = useSetRecoilState(errorMessageState);
+  const [isDisabled, setIsDisabled] = useRecoilState(disabledState);
 
   //각 스텝별 페이지 렌더링
   const switchAuthPage = () => {
@@ -32,11 +33,11 @@ const AuthForm = () => {
       case params.step === '3':
         return <ThirdStep />;
       default:
-        return <FirstStep disabled={disabled} />;
+        return <FirstStep disabled={isDisabled} />;
     }
   };
 
-  //각각의 필드들 유효성 검사 후 disavle 해제
+  //각각의 필드들 유효성 검사 후 인증요청 보내는 함수
   const onSubmit = async (data) => {
     if (
       !validateName(data.name) ||
@@ -53,7 +54,7 @@ const AuthForm = () => {
     if (!validateFullRegNo(data.birth + data.regNum)) {
       return;
     }
-    setDisabled(false);
+    setIsDisabled(false);
     try {
       const body = {
         name: data?.name,
