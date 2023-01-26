@@ -102,6 +102,7 @@ const SecondStep = () => {
       navigator('/auth/3', { replace: true });
     }
   };
+
   return (
     <__Container>
       <__HeaderWrapper>

@@ -65,7 +65,9 @@ const AuthForm = () => {
         `${process.env.REACT_APP_BASE_URL}/api/v1/easysign/complete`,
         { ...body },
       );
+      setErrMessage('');
     } catch (error) {
+      console.log(error);
       setErrMessage('올바른 정보를 입력해주세요.');
     }
   };
